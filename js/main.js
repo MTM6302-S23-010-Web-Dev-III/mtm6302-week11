@@ -100,6 +100,16 @@ function openModal () {
 /*-------------------------
   Week 11 - Local Storage
 ---------------------------*/
+let savedCats = localStorage.getItem("mycats")
+// console.log(savedCats)
+
+// if savedCats is not set then set it to empty array
+if (!savedCats) {
+  savedCats = []
+} else {
+  // else savedCats is set then parse it to convert to the array
+  savedCats = JSON.parse(savedCats)
+}
 
 const likeButtons = document.querySelectorAll(".like")
 
@@ -107,5 +117,47 @@ const likeButtons = document.querySelectorAll(".like")
 if (likeButtons.length > 0) {
   for (const likeButton of likeButtons) {
     likeButton.addEventListener("click", likeCat)
+    for (savedCat of savedCats) {
+      if (likeButton.dataset.catname == savedCat.name) {
+        likeButton.classList.remove("btn-light")
+        likeButton.classList.add("btn-danger")
+        likeButton.textContent = "Liked"
+      }
+    }
   }
+
+}
+
+function likeCat (e) {
+  e.preventDefault()
+  const catName = this.dataset.catname
+  const catBio = this.dataset.catbio
+  const catThumb = this.dataset.catthumb
+  const catImg = this.dataset.catfullimg
+  const catInfo = { name: catName, bio: catBio, thumb: catThumb, img: catImg }
+  // console.log(catInfo)
+
+  // run the function findCat with the catName parameter and save the return in catExist variable
+  const catExist = findCat(catName)
+  if (catExist !== null) {
+    alert("This cat is already liked")
+  } else {
+    // else the catExist is null
+    // we push the catInfo to the savedCats array
+    savedCats.push(catInfo)
+    // we now save the savedCats to localStorage
+    localStorage.setItem("mycats", JSON.stringify(savedCats))
+    this.classList.remove("btn-light")
+    this.classList.add("btn-danger")
+    this.textContent = "Liked"
+  }
+}
+
+function findCat (catName) {
+  for (savedCat of savedCats) {
+    if (savedCat.name == catName) {
+      return savedCats.indexOf(savedCat)
+    }
+  }
+  return null
 }
