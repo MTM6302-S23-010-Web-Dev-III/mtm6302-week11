@@ -51,11 +51,11 @@ const cats = [
 
 const catsRow = document.getElementById("catsRow")
 const cards = []
-
-for (const cat of cats) {
-  console.log(cat.name)
-  // create card HTML template copying from HTML page and replacing content with values from the object
-  const card = `
+if (catsRow) {
+  for (const cat of cats) {
+    console.log(cat.name)
+    // create card HTML template copying from HTML page and replacing content with values from the object
+    const card = `
     <div class="col">
       <div class="card">
         <img data-bs-toggle="modal" data-bs-target="#exampleModal" src="${cat.thumb}" class="card-img-top" alt="placeholder kitten" data-fullimg="${cat.img}">
@@ -68,11 +68,11 @@ for (const cat of cats) {
       </div>
     </div><!-- col ends -->`
 
-  // push each card template to the cards array
-  cards.push(card)
+    // push each card template to the cards array
+    cards.push(card)
+  }
+  catsRow.insertAdjacentHTML("afterbegin", cards.join(""))
 }
-catsRow.insertAdjacentHTML("afterbegin", cards.join(""))
-
 // selecting all the images
 const cardImages = document.querySelectorAll(".card-img-top")
 
@@ -160,4 +160,50 @@ function findCat (catName) {
     }
   }
   return null
+}
+
+// Liked Cats Page
+
+const likedCatsRow = document.getElementById("likedCatsRow")
+
+if (likedCatsRow) {
+
+  showLikedCats()
+
+  function showLikedCats () {
+    if (savedCats.length > 0) {
+      let likedCards = []
+      for (const cat of savedCats) {
+        const card = `
+      <div class="col">
+        <div class="card">
+          <img data-bs-toggle="modal" data-bs-target="#exampleModal" src="${cat.thumb}" class="card-img-top" alt="placeholder kitten" data-fullimg="${cat.img}">
+          <div class="card-body">
+            <h5 class="card-title">${cat.name}</h5>
+            <p class="card-text">${cat.bio}</p>
+            <a href="#" class="btn btn-light remove" data-catname="${cat.name}">Remove</a>
+          </div>
+        </div>
+      </div><!-- col ends -->`
+        likedCards.push(card)
+      }
+      likedCatsRow.innerHTML = likedCards.join("")
+    } else {
+      likedCatsRow.innerHTML = "No liked cats to show"
+    }
+  }
+  // delegate event click to remove buttons
+  likedCatsRow.addEventListener("click", removeCat)
+
+  function removeCat (e) {
+    if (e.target.classList.contains("remove")) {
+      e.preventDefault()
+      console.log(e.target.dataset.catname)
+      const savedCatIndex = findCat(e.target.dataset.catname)
+      savedCats.splice(savedCatIndex, 1)
+      localStorage.setItem("mycats", JSON.stringify(savedCats))
+      showLikedCats()
+    }
+  }
+
 }
